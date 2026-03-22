@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>脆薯饼仓库</title>
+    <!-- 引入 Google Fonts & Font Awesome 6 (免费图标库) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f2ef;  /* 低饱和暖灰基调 */
+            color: #2c2a29;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e8e6e3;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bcb9b2;
+            border-radius: 8px;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* 视图切换动画 */
+        .view {
+            animation: fadeSlideUp 0.4s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 头部卡片 (头像/名字/简介) */
+        .hero {
+            background: rgba(255, 255, 245, 0.75);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 2rem 2rem 2rem 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eae7e2;
+        }
+        .avatar {
+            width: 112px;
+            height: 112px;
+            background: #dedbd4;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+            border: 3px solid #fefaf5;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-placeholder {
+            font-size: 3.2rem;
+            color: #8d867c;
+        }
+        .hero h1 {
+            font-size: 1.9rem;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            color: #3b3a37;
+            margin-bottom: 0.5rem;
+        }
+        .hero .bio {
+            font-size: 1rem;
+            color: #6f6a63;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #f9f7f3;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        /* 文件夹网格区域 */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .section-title h2 {
+            font-weight: 500;
+            font-size: 1.5rem;
+            color: #4a4641;
+            letter-spacing: -0.2px;
+        }
+        .btn-outline-sm {
+            background: transparent;
+            border: 1px solid #d4d0c9;
+            padding: 0.45rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #5c564f;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline-sm:hover {
+            background: #e7e3dd;
+            border-color: #b9b2a8;
+            color: #2b2a27;
+        }
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.6rem;
+            margin-top: 0.5rem;
+        }
+        /* 文件夹卡片 */
+        .folder-card {
+            background: #fffefc;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.2rem 1rem 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.25s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #ece7e1;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+        }
+        .folder-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 28px -12px rgba(0, 0, 0, 0.12);
+            border-color: #dbd3ca;
+        }
+        .folder-icon {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .folder-icon i {
+            font-size: 2.2rem;
+            color: #b9aa93;
+        }
+        .folder-actions {
+            display: flex;
+            gap: 0.6rem;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: #9c948a;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 4px;
+        }
+        .icon-btn:hover {
+            color: #5b4e3e;
+        }
+        .folder-card h3 {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+            color: #3d3934;
+        }
+        .file-count {
+            font-size: 0.75rem;
+            color: #a2998e;
+            letter-spacing: 0.2px;
+            margin-top: 0.6rem;
+        }
+
+        /* 文件夹详情视图样式 */
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e4dfd8;
+        }
+        .back-home-btn {
+            background: #eae5de;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #4f4942;
+        }
+        .back-home-btn i {
+            margin-right: 6px;
+        }
+        .folder-detail-name {
+            font-size: 1.8rem;
+            font-weight: 500;
+            background: #f3f0ea;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .folder-detail-name input {
+            font-size: 1.2rem;
+            background: transparent;
+            border: 1px solid #ccc6bc;
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            font-weight: 500;
+        }
+        .upload-area {
+            background: #faf8f5;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e6dfd7;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 160px;
+        }
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #887f73;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .form-group input, .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.5rem 0.8rem;
+            border-radius: 1rem;
+            border: 1px solid #ddd6ce;
+            background: white;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #cfc8be;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            color: #2c2a27;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            background: #bcb2a5;
+            color: white;
+        }
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .file-item {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border: 1px solid #ece2d9;
+            transition: all 0.15s;
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            flex: 2;
+        }
+        .file-name {
+            font-weight: 500;
+            word-break: break-word;
+            max-width: 220px;
+        }
+        .file-time {
+            font-size: 0.7rem;
+            background: #f1ede8;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            color: #6b6258;
+        }
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 3rem;
+            color: #a0988d;
+        }
+        /* 响应式微调 */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 1.2rem;
+            }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .folder-detail-name {
+                font-size: 1.3rem;
+            }
+        }
+        /* 模态框 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(40, 38, 35, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-mask.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: #fffcf7;
+            max-width: 380px;
+            width: 90%;
+            border-radius: 2rem;
+            padding: 1.6rem;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2);
+        }
+        .modal-container h4 {
+            margin-bottom: 1rem;
+        }
+        .modal-container input {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 1rem;
+            border: 1px solid #d1c8be;
+            margin-bottom: 1.2rem;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <!-- 主页视图 -->
+    <div id="homeView" class="view">
+        <div class="hero">
+            <div class="avatar">
+                <img id="avatarImg" src="https://picsum.photos/id/20/120/120" alt="avatar" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <h1>林屿尘<span style="font-weight: 300; font-size: 1rem;"> · 慢写簿</span></h1>
+            <div class="bio">记录灵感、影像与散落的文字 · 低饱和日常</div>
+        </div>
+
+        <div class="section-title">
+            <h2><i class="fas fa-folder-tree" style="margin-right: 8px;"></i> 笔记本</h2>
+            <button class="btn-outline-sm" id="addFolderBtn"><i class="fas fa-plus"></i> 新建文件夹</button>
+        </div>
+        <div class="folders-grid" id="foldersGrid">
+            <!-- 动态渲染文件夹卡片 -->
+        </div>
+    </div>
+
+    <!-- 文件夹详情视图 (初始隐藏) -->
+    <div id="folderView" class="view" style="display: none;">
+        <div class="detail-header">
+            <button class="back-home-btn" id="backHomeBtn"><i class="fas fa-arrow-left"></i> 返回主页</button>
+            <div class="folder-detail-name" id="folderDetailNameWrapper">
+                <i class="fas fa-folder-open"></i> <span id="folderNameDisplay"></span>
+                <button class="icon-btn" id="editFolderNameBtn"><i class="fas fa-pen"></i></button>
+            </div>
+        </div>
+
+        <!-- 上传区 -->
+        <div class="upload-area">
+            <h4 style="margin-bottom: 12px; font-weight: 500;"><i class="fas fa-cloud-upload-alt"></i> 上传新文件</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>选择文件</label>
+                    <input type="file" id="uploadFileInput">
+                </div>
+                <div class="form-group">
+                    <label>创作时间</label>
+                    <input type="datetime-local" id="fileCustomTime">
+                </div>
+                <button class="btn-primary" id="confirmUploadBtn"><i class="fas fa-save"></i> 上传并记录</button>
+            </div>
+        </div>
+
+        <h4 style="margin: 1rem 0 0.8rem;"><i class="fas fa-list-ul"></i> 文件清单</h4>
+        <div id="filesListContainer" class="files-list">
+            <!-- 动态文件列表 -->
+        </div>
+    </div>
+</div>
+
+<!-- 通用编辑时间模态框 -->
+<div id="timeEditModal" class="modal-mask">
+    <div class="modal-container">
+        <h4><i class="far fa-calendar-alt"></i> 修改创作时间</h4>
+        <input type="datetime-local" id="editTimeInput">
+        <div class="modal-buttons">
+            <button class="btn-outline-sm" id="cancelTimeBtn">取消</button>
+            <button class="btn-primary" id="saveTimeBtn">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 存储 KEY ----------
+    const STORAGE_KEY = 'LowSatBlog_Folders';
+
+    // ---------- 辅助函数 ----------
+    function generateId() {
+        return Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+    }
+
+    // 默认初始数据 (低饱和示例)
+    const defaultFolders = [
+        {
+            id: 'folder_1',
+            name: '📁 散文集',
+            files: [
+                { id: 'f1', name: '傍晚的雨.txt', createdAt: '2025-02-15T19:30', dataUrl: null, fileType: 'text/plain', size: 0 },
+                { id: 'f2', name: '巷子口.jpg', createdAt: '2025-01-20T14:20', dataUrl: null, fileType: 'image/jpeg', size: 0 }
+            ]
+        },
+        {
+            id: 'folder_2',
+            name: '📷 瞬间博物馆',
+            files: []
+        },
+        {
+            id: 'folder_3',
+            name: '🎧 听觉日志',
+            files: []
+        }
+    ];
+
+    // 加载/初始化数据 (确保每个文件含有必要字段，示例文件没有真实dataUrl 但演示时用户会自己上传覆盖，也可以保留虚拟占位)
+    function loadFolders() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                let folders = JSON.parse(stored);
+                // 保证每个文件结构完整
+                folders.forEach(folder => {
+                    if (!folder.files) folder.files = [];
+                    folder.files.forEach(file => {
+                        if (!file.createdAt) file.createdAt = new Date().toISOString().slice(0,16);
+                        if (!file.id) file.id = generateId();
+                    });
+                });
+                return folders;
+            } catch(e) { console.warn(e); }
+        }
+        // 初始化示例中由于无真实dataUrl, 为了避免预览出错，直接给示例文件生成空的文本占位（用户以后可删除/重新上传）
+        const initFolders = JSON.parse(JSON.stringify(defaultFolders));
+        // 为示例文件添加虚拟可下载占位 (实际无内容，但展示时不做真实下载报错, 让用户自行替换)
+        initFolders[0].files[0].dataUrl = "data:text/plain;base64,5piv5LiA5Liq5pWw5o2u77yM5q2j5Zyo5Y+R6Z2i5pe26LS555qE5ZGo44CC"; // "是一个文本文件，写在下雨的故事。"
+        initFolders[0].files[1].dataUrl = "https://picsum.photos/id/104/200/150"; // 示例图片链接，非持久但可看，但为了演示上传会替换
+        initFolders[0].files[1].fileType = "image/jpeg";
+        return initFolders;
+    }
+
+    let foldersData = loadFolders();
+
+    function saveFolders() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(foldersData));
+    }
+
+    // 全局状态
+    let currentFolderId = null;
+    let editingFileTemp = { folderId: null, fileId: null };
+
+    // DOM 元素
+    const homeView = document.getElementById('homeView');
+    const folderView = document.getElementById('folderView');
+    const foldersGrid = document.getElementById('foldersGrid');
+    const filesListContainer = document.getElementById('filesListContainer');
+    const folderNameDisplaySpan = document.getElementById('folderNameDisplay');
+    const backHomeBtn = document.getElementById('backHomeBtn');
+    const addFolderBtn = document.getElementById('addFolderBtn');
+    const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+    const uploadFileInput = document.getElementById('uploadFileInput');
+    const fileCustomTime = document.getElementById('fileCustomTime');
+    const editFolderNameBtn = document.getElementById('editFolderNameBtn');
+
+    // 模态框元素
+    const modal = document.getElementById('timeEditModal');
+    const editTimeInput = document.getElementById('editTimeInput');
+    const cancelTimeBtn = document.getElementById('cancelTimeBtn');
+    const saveTimeBtn = document.getElementById('saveTimeBtn');
+
+    // ---------- 渲染主页 ----------
+    function renderHome() {
+        if (!foldersGrid) return;
+        foldersGrid.innerHTML = '';
+        foldersData.forEach(folder => {
+            const card = document.createElement('div');
+            card.className = 'folder-card';
+            card.setAttribute('data-id', folder.id);
+            const fileCount = folder.files ? folder.files.length : 0;
+            card.innerHTML = `
+                <div class="folder-icon">
+                    <i class="fas fa-folder"></i>
+                    <div class="folder-actions">
+                        <button class="icon-btn edit-folder-name" data-id="${folder.id}" title="重命名"><i class="fas fa-edit"></i></button>
+                        <button class="icon-btn delete-folder" data-id="${folder.id}" title="删除文件夹"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <h3>${escapeHtml(folder.name)}</h3>
+                <div class="file-count">${fileCount} 个记录</div>
+            `;
+            // 打开文件夹详情 (点击卡片主体)
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.edit-folder-name') || e.target.closest('.delete-folder')) return;
+                openFolderDetail(folder.id);
+            });
+            // 重命名按钮
+            const renameBtn = card.querySelector('.edit-folder-name');
+            renameBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                renameFolderById(folder.id);
+            });
+            const delBtn = card.querySelector('.delete-folder');
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`确定删除文件夹“${folder.name}”及其所有文件吗？`)) {
+                    deleteFolderById(folder.id);
+                }
+            });
+            foldersGrid.appendChild(card);
+        });
+    }
+
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function renameFolderById(id) {
+        const folder = foldersData.find(f => f.id === id);
+        if (!folder) return;
+        let newName = prompt('请输入新的文件夹名称', folder.name);
+        if (newName && newName.trim()) {
+            folder.name = newName.trim().substring(0, 30);
+            saveFolders();
+            renderHome();
+            if (currentFolderId === id) {
+                folderNameDisplaySpan.innerText = folder.name;
+            }
+        }
+    }
+
+    function deleteFolderById(id) {
+        const idx = foldersData.findIndex(f => f.id === id);
+        if (idx !== -1) {
+            foldersData.splice(idx, 1);
+            saveFolders();
+            renderHome();
+            if (currentFolderId === id) {
+                // 如果删除的是当前打开的文件夹，跳回主页
+                backToHome();
+            }
+        }
+    }
+
+    // 添加新文件夹
+    function addNewFolder() {
+        let folderName = prompt('新建文件夹名称', '未命名笔记');
+        if (!folderName) folderName = '新笔记';
+        const newFolder = {
+            id: generateId(),
+            name: folderName.substring(0, 28),
+            files: []
+        };
+        foldersData.push(newFolder);
+        saveFolders();
+        renderHome();
+    }
+
+    // ---------- 文件夹详情视图 ----------
+    function openFolderDetail(folderId) {
+        const folder = foldersData.find(f => f.id === folderId);
+        if (!folder) return;
+        currentFolderId = folderId;
+        folderNameDisplaySpan.innerText = folder.name;
+        renderFilesInFolder(folderId);
+        // 切换视图
+        homeView.style.display = 'none';
+        folderView.style.display = 'block';
+        // 重置上传表单
+        uploadFileInput.value = '';
+        fileCustomTime.value = new Date().toISOString().slice(0,16);
+    }
+
+    function renderFilesInFolder(folderId) {
+        const folder = foldersData.find(f => f.id === folderId);
+        if (!folder) return;
+        filesListContainer.innerHTML = '';
+        if (!folder.files.length) {
+            filesListContainer.innerHTML = '<div class="empty-message"><i class="far fa-folder-open"></i> 暂无文件，上传你的第一篇记录吧 ✨</div>';
+            return;
+        }
+        folder.files.forEach(file => {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'file-item';
+            const timeStr = file.createdAt ? file.createdAt.replace('T', ' ') : '未知时间';
+            const fileIcon = file.fileType?.startsWith('image/') ? '<i class="fas fa-image"></i>' : '<i class="fas fa-file-alt"></i>';
+            fileDiv.innerHTML = `
+                <div class="file-info">
+                    <span>${fileIcon}</span>
+                    <span class="file-name">${escapeHtml(file.name)}</span>
+                    <span class="file-time"><i class="far fa-clock"></i> ${escapeHtml(timeStr)}</span>
+                </div>
+                <div class="file-actions">
+                    <button class="icon-btn edit-time-btn" data-id="${file.id}" title="修改创作时间"><i class="fas fa-calendar-edit"></i></button>
+                    <button class="icon-btn download-file-btn" data-id="${file.id}" title="下载文件"><i class="fas fa-download"></i></button>
+                    <button class="icon-btn delete-file-btn" data-id="${file.id}" title="删除文件"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            // 修改时间
+            const editTimeBtn = fileDiv.querySelector('.edit-time-btn');
+            editTimeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTimeModal(folder.id, file.id, file.createdAt);
+            });
+            // 下载
+            const downloadBtn = fileDiv.querySelector('.download-file-btn');
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadFile(file);
+            });
+            // 删除
+            const delFileBtn = fileDiv.querySelector('.delete-file-btn');
+            delFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`删除文件“${file.name}”?`)) {
+                    deleteFileFromFolder(folder.id, file.id);
+                }
+            });
+            filesListContainer.appendChild(fileDiv);
+        });
+    }
+
+    function deleteFileFromFolder(folderId, fileId) {
+        const folder = foldersData.find(f => f.id === folderId);
+        if (folder) {
+            folder.files = folder.files.filter(f => f.id !== fileId);
+            saveFolders();
+            renderFilesInFolder(folderId);
+            renderHome();  // 更新主页文件计数
+        }
+    }
+
+    function downloadFile(file) {
+        if (!file.dataUrl) {
+            alert('文件内容缺失，请重新上传该文件。');
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = file.dataUrl;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 打开时间模态框
+    let currentModalCb = null;
+    function openTimeModal(folderId, fileId, currentTime) {
+        editingFileTemp = { folderId, fileId };
+        let timeValue = currentTime || new Date().toISOString().slice(0,16);
+        editTimeInput.value = timeValue;
+        modal.classList.add('active');
+        const onSave = () => {
+            const newTime = editTimeInput.value;
+            if (newTime) {
+                const folder = foldersData.find(f => f.id === folderId);
+                if (folder) {
+                    const targetFile = folder.files.find(f => f.id === fileId);
+                    if (targetFile) {
+                        targetFile.createdAt = newTime;
+                        saveFolders();
+                        renderFilesInFolder(folderId);
+                        renderHome();
+                    }
+                }
+            }
+            modal.classList.remove('active');
+        };
+        const onCancel = () => {
+            modal.classList.remove('active');
+        };
+        const saveBtnHandler = () => { onSave(); cleanup(); };
+        const cancelBtnHandler = () => { onCancel(); cleanup(); };
+        function cleanup() {
+            saveTimeBtn.removeEventListener('click', saveBtnHandler);
+            cancelTimeBtn.removeEventListener('click', cancelBtnHandler);
+            modal.removeEventListener('click', outsideHandler);
+        }
+        function outsideHandler(e) {
+            if (e.target === modal) { onCancel(); cleanup(); }
+        }
+        saveTimeBtn.addEventListener('click', saveBtnHandler);
+        cancelTimeBtn.addEventListener('click', cancelBtnHandler);
+        modal.addEventListener('click', outsideHandler);
+    }
+
+    // 上传文件逻辑
+    async function uploadFileToFolder() {
+        if (!currentFolderId) return;
+        const fileInput = uploadFileInput.files[0];
+        if (!fileInput) {
+            alert('请选择一个文件');
+            return;
+        }
+        let customTime = fileCustomTime.value;
+        if (!customTime) customTime = new Date().toISOString().slice(0,16);
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const dataUrl = evt.target.result;
+            const newFile = {
+                id: generateId(),
+                name: fileInput.name,
+                createdAt: customTime,
+                dataUrl: dataUrl,
+                fileType: fileInput.type,
+                size: fileInput.size
+            };
+            const folder = foldersData.find(f => f.id === currentFolderId);
+            if (folder) {
+                folder.files.push(newFile);
+                saveFolders();
+                renderFilesInFolder(currentFolderId);
+                renderHome(); // 更新主页数量
+                uploadFileInput.value = '';
+                // 重置时间为现在
+                fileCustomTime.value = new Date().toISOString().slice(0,16);
+            } else {
+                alert('文件夹不存在');
+            }
+        };
+        reader.onerror = () => { alert('读取文件失败'); };
+        reader.readAsDataURL(fileInput);
+    }
+
+    // 重命名当前文件夹
+    function renameCurrentFolder() {
+        if (!currentFolderId) return;
+        const folder = foldersData.find(f => f.id === currentFolderId);
+        if (folder) {
+            let newName = prompt('重命名文件夹', folder.name);
+            if (newName && newName.trim()) {
+                folder.name = newName.trim().substring(0, 30);
+                saveFolders();
+                folderNameDisplaySpan.innerText = folder.name;
+                renderHome();
+            }
+        }
+    }
+
+    function backToHome() {
+        currentFolderId = null;
+        homeView.style.display = 'block';
+        folderView.style.display = 'none';
+        renderHome();
+    }
+
+    // 路由及事件绑定
+    function initEventListeners() {
+        backHomeBtn.addEventListener('click', backToHome);
+        addFolderBtn.addEventListener('click', addNewFolder);
+        confirmUploadBtn.addEventListener('click', uploadFileToFolder);
+        if (editFolderNameBtn) {
+            editFolderNameBtn.addEventListener('click', renameCurrentFolder);
+        }
+    }
+
+    // 启动时渲染主页并监听hash (简单支持互相跳转, 也满足前进后退)
+    function routeHandler() {
+        const hash = window.location.hash.slice(1);
+        if (hash.startsWith('folder/')) {
+            const id = hash.split('/')[1];
+            const exists = foldersData.some(f => f.id === id);
+            if (exists) {
+                openFolderDetail(id);
+            } else {
+                backToHome();
+            }
+        } else {
+            backToHome();
+        }
+    }
+    window.addEventListener('hashchange', routeHandler);
+    // 修改路由方法辅助跳转
+    function navigateToFolder(id) {
+        window.location.hash = `folder/${id}`;
+    }
+    function navigateHome() {
+        window.location.hash = '';
+    }
+    // 覆写部分跳转
+    const originalOpen = openFolderDetail;
+    window.openFolderDetail = function(id) {
+        originalOpen(id);
+        window.location.hash = `folder/${id}`;
+    };
+    openFolderDetail = function(id) {
+        originalOpen(id);
+        if (id) window.location.hash = `folder/${id}`;
+    };
+    backToHome = function() {
+        currentFolderId = null;
+        homeView.style.display = 'block';
+        folderView.style.display = 'none';
+        renderHome();
+        window.location.hash = '';
+    };
+    // 绑定新函数
+    window.backToHome = backToHome;
+    // 重新绑定方法
+    window.openFolderDetail = openFolderDetail;
+
+    // 初始化渲染
+    function init() {
+        renderHome();
+        initEventListeners();
+        // 初始路由
+        if (window.location.hash) routeHandler();
+        else backToHome();
+        // 设置默认时间
+        fileCustomTime.value = new Date().toISOString().slice(0,16);
+        // 附加全局方法
+        window.renameFolderById = renameFolderById;
+        window.deleteFolderById = deleteFolderById;
+    }
+    init();
+</script>
+</body>
+</html>
