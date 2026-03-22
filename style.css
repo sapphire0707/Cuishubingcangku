@@ -1,7 +1,7 @@
 /* style.css - 个人博客低饱和风格 */
 :root {
-    --bg-primary: #FDE8D3;
-    --accent-warm: #F3C382;
+    --bg-primary: #FCEFF0;
+    --accent-warm: #F7D2D5;
     --accent-soft: #DAEBE3;
     --card-bg: rgba(255, 251, 245, 0.9);
     --text-dark: #5C4B3A;
